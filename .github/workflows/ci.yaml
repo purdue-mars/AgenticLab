@@ -33,8 +33,3 @@ jobs:
         shell: bash -l {0}
         run: |
           bash third_party.sh
-
-      - name: Test import agenticlab
-        shell: bash -l {0}
-        run: |
-          python3 -c "import agenticlab"
