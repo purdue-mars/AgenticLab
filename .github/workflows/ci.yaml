@@ -1,0 +1,40 @@
+name: AgenticLab Main Build
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - '**'  # Run on push to any branch
+  schedule:
+    - cron: "0 6 * * 1"  # 6 AM every Monday
+
+jobs:
+  build_and_test:
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - ubuntu-22.04
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up micromamba
+        uses: mamba-org/setup-micromamba@v1
+        with:
+          environment-file: conda_env.yaml
+          environment-name: agenticlab
+          cache-environment: true
+
+      - name: Run third_party.sh
+        shell: bash -l {0}
+        run: |
+          bash third_party.sh
+
+      - name: Test import agenticlab
+        shell: bash -l {0}
+        run: |
+          python3 -c "import agenticlab"
