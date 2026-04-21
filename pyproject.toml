@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agenticlab"
+version = "0.1.0"
+description = "AgenticLab: A modular agentic framework for robot manipulation"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=1.24",
+    "Pillow>=9.0",
+    "pyyaml>=6.0",
+    "openai>=1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pre-commit",
+]
+hardware = [
+    "ur_rtde",
+    "dynamixel_sdk",
+    "open3d",
+]
+local-model = [
+    "torch>=2.4.0",
+    "transformers>=4.40",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
