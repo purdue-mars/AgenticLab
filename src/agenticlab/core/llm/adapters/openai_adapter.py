@@ -25,7 +25,7 @@ class OpenAIAdapter(BaseLLMClient):
         # Set up token counter CSV path
         self.project_root = Path(__file__).resolve().parents[3]
         self.token_csv_path = (
-            self.project_root / "output" / "token_counter" / "total_token.csv"
+            self.project_root / "output" / "token_counter" / "openai_total_token.csv"
         )
 
     def _log_token_count(self, total_tokens: int):
@@ -103,37 +103,3 @@ class OpenAIAdapter(BaseLLMClient):
             return [{"role": "user", "content": content}]
         else:
             return [{"role": "user", "content": prompt}]
-
-
-# Commented out, later we will fix the sys.path here
-# if __name__ == "__main__":
-#     import os
-#     import json
-#     from PIL import Image
-
-#     # Example usage
-#     config = {
-#         "model": "gpt-4o", # Updated to a more common model for testing
-#         "api_key_env": "OPENAI_API_KEY"
-#     }
-
-#     adapter = OpenAIAdapter(config)
-
-#     image_path = "data/data_for_test/color.png"
-#     image = Image.open(image_path).convert("RGB")
-#     prompt = "Describe the objects in the image in JSON format."
-
-#     # Test single image
-#     result = adapter.call(prompt=prompt, image=image)
-#     print("Single image result:")
-#     print(json.dumps(result, indent=4, ensure_ascii=False))
-
-#     # Test multiple images
-#     image_path_2 = "data/Submodule_test_data/task_completion/17_crossword_fail_after.png"
-#     image_2 = Image.open(image_path_2).convert("RGB")
-#     image_path_3 = "data/Submodule_test_data/task_completion/17_crossword_fail_before.png"
-#     image_3 = Image.open(image_path_3).convert("RGB")
-
-#     result_multi = adapter.call(prompt="What is the difference between these two images?", image=[image_2, image_3])
-#     print("\nMultiple images result:")
-#     print(json.dumps(result_multi, indent=4, ensure_ascii=False))
