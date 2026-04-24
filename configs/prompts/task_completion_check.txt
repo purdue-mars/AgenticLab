@@ -1,0 +1,52 @@
+Analyze the scene in the provided image and determine if ALL goal conditions are satisfied, indicating task completion.
+
+Goal conditions (in PDDL format):
+{goal_conditions}
+
+## Understanding PDDL Predicates:
+- `(hand-empty)`: The robot gripper is not holding any object
+- `(holding ?obj)`: The robot gripper is currently holding the specified object
+- `(clear ?obj)`: There is NO object on top of the specified object (the object's top surface is free/clear)
+- `(on-table ?obj)`: The object is placed directly on the table surface
+- `(on-top-of ?obj1 ?obj2)`: Object1 is placed on top of Object2
+- `(not (predicate))`: The negation of the predicate (the condition is NOT true)
+- `(and ...)`: ALL conditions inside must be satisfied
+- `(or ...)`: AT LEAST ONE condition inside must be satisfied
+
+## Example Analysis:
+For goal conditions:
+- `(on-top-of lemon-1 bowl-1)` → Is lemon-1 placed on top of bowl-1?
+- `(on-top-of apple-1 blue-block-1)` → Is apple-1 placed on top of blue-block-1?
+- `(holding orange-1)` → Is the robot gripper holding orange-1?
+
+You should check EACH goal individually:
+1. `(on-top-of lemon-1 bowl-1)` → true/false with explanation
+2. `(on-top-of apple-1 blue-block-1)` → true/false with explanation
+3. `(holding orange-1)` → true/false with explanation
+
+## Your Task:
+1. Carefully examine the scene in the image
+2. Parse ALL goal conditions and identify each individual predicate
+3. For EACH goal predicate, check if it is satisfied and explain WHY based on what you see
+4. Determine the overall task completion based on whether ALL goals are satisfied
+
+Return your response in JSON format:
+{{
+    "goals_analysis": [
+        {{
+            "goal": "the exact predicate string (e.g., '(on-top-of lemon-1 bowl-1)')",
+            "satisfied": true/false,
+            "observation": "what you observed in the image for this specific goal"
+        }},
+        ...
+    ],
+    "success": true/false,
+    "reasoning": "Overall conclusion: explain whether ALL goal conditions are satisfied based on the individual goal checks",
+    "failed_conditions": ["list of goal predicates that are NOT satisfied (empty list if all satisfied)"]
+}}
+
+IMPORTANT:
+- Analyze EACH goal predicate separately in "goals_analysis"
+- Return "success": true ONLY if ALL goal conditions are satisfied
+- If even one goal is not met, return "success": false
+- The task is complete only when every single goal has been achieved

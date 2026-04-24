@@ -1,0 +1,15 @@
+ObjDetector:
+  method: "vlm" # Options: "vlm", "langsam", "qwen_local", "molmo_local"
+  # output_dir: "output/obj_detector"
+  # vlm_model: "qwen:qwen-vl-max"
+  # vlm_model: "qwen:qwen3-vl-plus"
+  # vlm_model: "openai:gpt-5.2-2025-12-11"
+  # vlm_model: "openai:chatgpt-4o-latest"
+  vlm_model: "gemini:gemini-3-flash-preview"
+  # vlm_model: "gemini:gemini-3-pro-preview"
+  # vlm_model: "gemini:gemini-robotics-er-1.5-preview"
+  # vlm_model: "claude:claude-opus-4-5-20251101"
+  # vlm_model: "claude:claude-sonnet-4-5-20250929"
+  prompt_path: "configs/prompts/detect_all_obj_prompt.txt"
+  molmo_prompt_path: "configs/prompts/detect_obj_molmo_prompt.txt"
+  max_iterations: 5
