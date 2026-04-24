@@ -1,0 +1,20 @@
+paths:
+  output_dir: output
+
+llm:
+  provider: gemini
+  model: gemini-3-flash-preview
+
+planning:
+  task_parser:
+    config_path: configs/task_parser_config.yaml
+    prompt_path: configs/prompts/task_parser_nl.txt
+
+  action_checker:
+    config_path: configs/action_checker_config.yaml
+    precondition_prompt: configs/prompts/precondition_check.txt
+    effect_prompt: configs/prompts/effect_check.txt
+
+perception:
+  obj_detector:
+    config_path: configs/obj_detector_config.yaml
