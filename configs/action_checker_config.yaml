@@ -1,0 +1,21 @@
+ActionChecker:
+  # vlm_model_name: "qwen:qwen-vl-max"
+  # vlm_model_name: "qwen:qwen3-vl-plus"
+  # vlm_model_name: "openai:chatgpt-4o-latest"
+  # vlm_model_name: "openai:gpt-5.2-2025-12-11"
+  # vlm_model_name: "gemini:gemini-3-flash-preview"
+  # vlm_model_name: "gemini:gemini-3-pro-preview"
+  # vlm_model_name: "claude:claude-opus-4-5-20251101"
+  # vlm_model_name: "gemini:gemini-robotics-er-1.5-preview"
+  # vlm_model_name: "claude:claude-opus-4-5-20251101"
+  vlm_model_name: "claude:claude-sonnet-4-5-20250929"
+  # vlm_model_name: "qwen_local:Qwen/Qwen2.5-VL-7B-Instruct"
+  # vlm_model_name: "molmo_local:allenai/Molmo-7B-D-0924"
+  precondition_prompt_path: "configs/prompts/precondition_check_prompt.txt"
+  effect_prompt_path: "configs/prompts/effect_check_prompt.txt"
+  completion_prompt_path: "configs/prompts/task_completion_check_prompt.txt"
+  completion_multi_img_prompt_path: "configs/prompts/task_completion_check_multi_img_prompt.txt"
+  output_dir: "output/action_checker"
+  is_check_precondition: false
+  is_check_effect: false
+  is_check_task_completion: true

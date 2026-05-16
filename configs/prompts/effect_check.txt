@@ -1,0 +1,55 @@
+Analyze the scene in the provided image and determine if ALL expected effects have been achieved after executing the action.
+
+Action executed: {action}
+Expected effects (in PDDL format): {effect}
+
+## Understanding PDDL Predicates:
+- `(hand-empty)`: The robot gripper is not holding any object
+- `(holding ?obj)`: The robot gripper is currently holding the specified object
+- `(clear ?obj)`: There is NO object on top of the specified object (the object's top surface is free/clear)
+- `(on-table ?obj)`: The object is placed directly on the table surface (if another object is between the object and the table, it is **not** on the table)
+- `(on-top-of ?obj1 ?obj2)`: Object1 is placed directly on top of Object2 (no intermediate object)
+- `(not (predicate))`: The negation of the predicate (the condition should NOT be true after the action)
+- `(and ...)`: ALL effects inside must be achieved
+- `(or ...)`: AT LEAST ONE effect inside must be achieved
+
+## Handling Quantifiers (exists / forall):
+- The domain only contains the objects declared in the `problem.pddl`. When you see a quantified predicate such as `(exists (?other - object) (on-top-of yellow-block-1 ?other))`, you must expand it by enumerating the **actual objects** listed in the problem (e.g., `orange-block-1`, `plate-1`, `cloth-1`, etc.).
+- Mark the predicate **true** only if you observe at least one of those concrete objects satisfying the condition. Do **not** invent or infer new placeholder objects (e.g., an unmodeled plate) to satisfy the predicate.
+
+## Example Analysis:
+For action: `(place-on-object lemon-1 bowl-1)` with effect: `(and (on-top-of lemon-1 bowl-1) (hand-empty) (clear lemon-1) (not (clear bowl-1)) (not (holding lemon-1)))`
+You should check:
+1. `(on-top-of lemon-1 bowl-1)` → Is lemon-1 now on top of bowl-1? true/false
+2. `(hand-empty)` → Is the gripper now empty? true/false
+3. `(clear lemon-1)` → Is there nothing on top of lemon-1? true/false
+4. `(not (clear bowl-1))` → Is there now something on bowl-1 (should NOT be clear)? true/false
+5. `(not (holding lemon-1))` → Is the gripper NOT holding lemon-1 anymore? true/false
+
+## Your Task:
+1. Carefully examine the location of the robot gripper and identify whether it is holding an object
+2. If the robot gripper is holding an object, then determine on if the object matches the specified object
+3. Parse the effect and identify ALL individual predicates
+4. For EACH predicate, check if it is achieved and explain WHY
+5. Determine the overall success based on logical operators (and/or/not)
+
+Return your response in JSON format:
+{{
+    "effects_analysis": [
+        {{
+            "effect": "the exact predicate string (e.g., '(on-top-of lemon-1 bowl-1)')",
+            "achieved": true/false,
+            "observation": "what you observed in the image for this specific effect"
+        }},
+        ...
+    ],
+    "success": true/false,
+    "reasoning": "Overall conclusion: explain whether ALL expected effects are achieved based on the individual effect checks",
+    "failed_conditions": ["list of predicates that are NOT achieved (empty list if all achieved)"]
+}}
+
+IMPORTANT:
+- Analyze EACH predicate separately in "effects_analysis"
+- Return "success": true ONLY if ALL effects (considering and/or/not logic) are achieved
+- If even one required effect is not achieved, return "success": false
+- Treat “paper”, “sheet”, “mat”, and “plate” as base objects: they are valid foundation objects that can support blocks
