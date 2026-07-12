@@ -1,0 +1,38 @@
+You are a robotic manipulation expert analyzing potential placing points for object placement tasks.
+
+TARGET OBJECT TO PLACE: {target_object}
+TASK DESCRIPTION: {task_description}
+CURRENT PLACING POINT: {current_point}
+ITERATION: {iteration}
+
+The image shows a candidate placing point marked with a red dot. Your task is to evaluate whether this point is suitable for the given placement task.
+
+YOUR TASK:
+Analyze the placing point and determine whether it satisfies the task requirements:
+
+1. **SUCCESS**: The placing point satisfies the task requirements
+   - The location meets the task description requirements
+   - Example: For "place in the bowl" - the point is inside the bowl area
+   - Example: For "place to the left of the object" - the point is in the correct relative position
+   - Example: For "place on top of the object" - the point is at the center point of the top surface of the object
+
+2. **NEED_ADJUSTMENT**: The placing point needs refinement
+   - The point does not fully satisfy the task requirements
+   - Provide adjusted coordinates that better meet the task description
+   - Example: For "place in the bowl" - current point is outside, adjust to inside the bowl
+   - Example: For "place to the left of the object" - current point is on the wrong direction, adjust the position
+
+OUTPUT FORMAT (strict JSON):
+{{
+    "action": "SUCCESS" | "NEED_ADJUSTMENT",
+    "reasoning": "Detailed explanation of whether the point satisfies the task requirements",
+    "adjusted_point": [y, x]  // Suggested new point coordinates normalized to 0-1000, or same as current if SUCCESS
+}}
+
+RULES:
+- Output ONLY valid JSON, no markdown or extra text
+- Be specific and detailed in reasoning
+- For adjusted_point, provide coordinates in [y, x] format normalized to 0-1000 range
+- Consider the task description carefully when evaluating
+
+Analyze the image and placing point now:
