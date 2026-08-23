@@ -1,5 +1,5 @@
 GraspPlanner:
-  evaluation_prompt_path: "configs/prompts/grasp_pose_evaluation_prompt_v2.txt"
+  evaluation_prompt_path: "configs/prompts/grasp_pose_evaluation_prompt.txt"
   # vlm_model_name: "qwen:qwen-vl-max"
   # vlm_model_name: "qwen:qwen3-vl-plus"
   # vlm_model_name: "openai:gpt-5.2-2025-12-11"

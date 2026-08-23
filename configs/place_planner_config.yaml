@@ -7,8 +7,8 @@ PlacePlanner:
   # vlm_model_name: "gemini:gemini-robotics-er-1.5-preview"
   # vlm_model_name: "claude:claude-sonnet-4-20250514"
   reflection_prompt_path: "configs/prompts/place_point_reflection_prompt.txt"
-  oriented_pose_prompt_path: "configs/prompt/place_orientated_pose_prompt.txt"
-  # oriented_pose_prompt_path: "configs/prompt/place_orientated_pose_prompt_wrist.txt" # use wrist camera for orientation analysis
+  oriented_pose_prompt_path: "configs/prompts/place_orientated_pose_prompt.txt"
+  # oriented_pose_prompt_path: "configs/prompts/place_orientated_pose_prompt_wrist.txt" # use wrist camera for orientation analysis
   use_reflection: False
   max_iterations: 3
   camera_cfg_path: "configs/camera_config.yaml"
