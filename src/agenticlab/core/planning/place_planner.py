@@ -214,10 +214,10 @@ class PlacePlanner:
         logger.info(f"VLM orientation analysis completed in {elapsed_time:.2f}s")
         logger.info(f"Result: {result}")
 
-        placing_point.yaw_rotation = result.get("yaw_rotation", 0.0)
-        placing_point.roll_rotation = result.get("roll_rotation", 0.0)
-        placing_point.place_offset = result.get("place_offset", 0.10)
-        placing_point.orientation_reasoning = result.get("reasoning", "")
+        placing_point.yaw_rotation = result.get("yaw_rotation", placing_point.yaw_rotation)
+        placing_point.roll_rotation = result.get("roll_rotation", placing_point.roll_rotation)
+        placing_point.place_offset = result.get("place_offset", placing_point.place_offset)
+        placing_point.orientation_reasoning = result.get("reasoning", placing_point.orientation_reasoning or "")
         return placing_point
 
     def _reflect_on_placing_point(
