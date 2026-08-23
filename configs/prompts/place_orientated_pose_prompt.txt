@@ -21,7 +21,7 @@ ROTATION PARAMETERS (CONSTRAINED):
 
 
 2. **yaw_rotation**:
-   - It only applys to the situation when object is vertical to the gripper
+   - It only applies to the situation when object is vertical to the gripper
    - Available options: 0° or -180°
    - Use -180° when the object cap (top surface) is pointing inwards to the camera
    - Use 0° when object cap is pointing outwards, equally when object bottom is pointing towards the camera
