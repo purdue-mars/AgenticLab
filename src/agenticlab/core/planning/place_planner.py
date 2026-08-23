@@ -110,7 +110,9 @@ class PlacePlanner:
             logger.warning("No pixel_to_3d_fn injected; skipping 3D pose computation.")
             return None
         cam_cfg = (self.camera_cfg or {}).get(which_camera)
-        intrinsics_raw = cam_cfg.get("intrinsic_matrix") if isinstance(cam_cfg, dict) else None
+        intrinsics_raw = (
+            cam_cfg.get("intrinsic_matrix") if isinstance(cam_cfg, dict) else None
+        )
         if intrinsics_raw is None:
             logger.warning(
                 "Camera config missing intrinsics for '%s'; skipping 3D pose.",
@@ -214,10 +216,18 @@ class PlacePlanner:
         logger.info(f"VLM orientation analysis completed in {elapsed_time:.2f}s")
         logger.info(f"Result: {result}")
 
-        placing_point.yaw_rotation = result.get("yaw_rotation", placing_point.yaw_rotation)
-        placing_point.roll_rotation = result.get("roll_rotation", placing_point.roll_rotation)
-        placing_point.place_offset = result.get("place_offset", placing_point.place_offset)
-        placing_point.orientation_reasoning = result.get("reasoning", placing_point.orientation_reasoning or "")
+        placing_point.yaw_rotation = result.get(
+            "yaw_rotation", placing_point.yaw_rotation
+        )
+        placing_point.roll_rotation = result.get(
+            "roll_rotation", placing_point.roll_rotation
+        )
+        placing_point.place_offset = result.get(
+            "place_offset", placing_point.place_offset
+        )
+        placing_point.orientation_reasoning = result.get(
+            "reasoning", placing_point.orientation_reasoning or ""
+        )
         return placing_point
 
     def _reflect_on_placing_point(
