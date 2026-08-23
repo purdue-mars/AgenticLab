@@ -26,13 +26,13 @@ OUTPUT FORMAT (strict JSON):
 {{
     "action": "SUCCESS" | "NEED_ADJUSTMENT",
     "reasoning": "Detailed explanation of whether the point satisfies the task requirements",
-    "adjusted_point": [y, x]  // Suggested new point coordinates normalized to 0-1000, or same as current if SUCCESS
+    "adjusted_point": [y, x]  // Suggested new point in IMAGE PIXEL coordinates [row, col] (or same as current if SUCCESS)
 }}
 
 RULES:
 - Output ONLY valid JSON, no markdown or extra text
 - Be specific and detailed in reasoning
-- For adjusted_point, provide coordinates in [y, x] format normalized to 0-1000 range
+- For adjusted_point, provide coordinates in [y, x] IMAGE PIXELS (integers within the image bounds)
 - Consider the task description carefully when evaluating
 
 Analyze the image and placing point now:
