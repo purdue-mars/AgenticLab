@@ -109,13 +109,15 @@ class PlacePlanner:
         if self.pixel_to_3d_fn is None:
             logger.warning("No pixel_to_3d_fn injected; skipping 3D pose computation.")
             return None
-        if not self.camera_cfg or which_camera not in self.camera_cfg:
+        cam_cfg = (self.camera_cfg or {}).get(which_camera)
+        intrinsics_raw = cam_cfg.get("intrinsic_matrix") if isinstance(cam_cfg, dict) else None
+        if intrinsics_raw is None:
             logger.warning(
                 "Camera config missing intrinsics for '%s'; skipping 3D pose.",
                 which_camera,
             )
             return None
-        intrinsics = np.array(self.camera_cfg[which_camera]["intrinsic_matrix"])
+        intrinsics = np.array(intrinsics_raw)
         return self.pixel_to_3d_fn(point, np.array(depth), intrinsics)
 
     def plan_placing_point(
