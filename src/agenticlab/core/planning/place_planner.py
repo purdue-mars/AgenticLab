@@ -261,6 +261,8 @@ class PlacePlanner:
     def save_results(
         self, image: Image.Image, placing_point: PlacingPoint, output_dir: str
     ):
+        os.makedirs(output_dir, exist_ok=True)
+
         final_viz_path = os.path.join(output_dir, "final_placing_point.png")
         self._save_visualization(image, np.array(placing_point.point), final_viz_path)
 
@@ -269,7 +271,7 @@ class PlacePlanner:
             "visualization_path": final_viz_path,
         }
         results_path = os.path.join(output_dir, "placing_point_result.json")
-        with open(results_path, "w") as f:
+        with open(results_path, "w", encoding="utf-8") as f:
             json.dump(result, f, indent=4, ensure_ascii=False)
 
         logger.info(f"Placing point results saved to {results_path}")
