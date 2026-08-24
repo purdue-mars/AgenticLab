@@ -1,0 +1,16 @@
+ActionWrapper:
+  approach_distance: 0.1  # Distance to stay above the grasp point before descending
+  clearance_height: 0.10   # Height to move to place position before releasing the object
+  robot_speed: 0.08    # Speed of the robot's end-effector
+  robot_acceleration: 0.1  # Acceleration of the robot's end-effector
+
+  # TCP pose in the grasp frame. This replaces the legacy hard-coded R_eg/T_ge.
+  # Naming follows T_target_source: p_grasp = T_grasp_tcp @ p_tcp.
+  T_grasp_tcp:
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-1.0, 0.0, 0.0, 0.0]
+    - [0.0, -1.0, 0.0, 0.0]
+    - [0.0, 0.0, 0.0, 1.0]
+
+  # UR-specific axis-angle orientation used for downward placement.
+  default_place_orientation_rotvec: [2.18896741, -2.24723741, -0.00680875]
