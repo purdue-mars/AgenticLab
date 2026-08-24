@@ -9,6 +9,7 @@ from agenticlab.utils.geometry_transforms import (
     invert_transform,
     make_transform,
     offset_along_local_axis,
+    pixel_to_camera_point,
     pose6d_to_transform,
     tcp_pose_from_camera_grasp,
     transform_points,
@@ -144,6 +145,75 @@ def test_apply_local_rpy_preserves_translation_and_order():
         T_world_tcp_rotated[:3, 3],
         [1.0, 2.0, 3.0],
     )
+
+
+def _pinhole_intrinsics():
+    return np.array(
+        [
+            [100.0, 0.0, 320.0],
+            [0.0, 200.0, 240.0],
+            [0.0, 0.0, 1.0],
+        ]
+    )
+
+
+def test_pixel_at_principal_point_projects_along_optical_axis():
+    depth_image = np.full((480, 640), 1500, dtype=np.uint16)
+
+    p_camera = pixel_to_camera_point(
+        [320, 240],
+        depth_image,
+        _pinhole_intrinsics(),
+        factor_depth=1000.0,
+    )
+
+    np.testing.assert_allclose(p_camera, [0.0, 0.0, 1.5])
+
+
+def test_pixel_offset_scales_with_focal_length_and_depth():
+    depth_image = np.full((480, 640), 2000, dtype=np.uint16)
+
+    p_camera = pixel_to_camera_point(
+        [420, 340],
+        depth_image,
+        _pinhole_intrinsics(),
+        factor_depth=1000.0,
+    )
+
+    # x: (420 - 320) * 2.0 / 100, y: (340 - 240) * 2.0 / 200
+    np.testing.assert_allclose(p_camera, [2.0, 1.0, 2.0])
+
+
+def test_factor_depth_converts_raw_units():
+    depth_image = np.full((480, 640), 20000, dtype=np.uint16)
+
+    p_camera = pixel_to_camera_point(
+        [320, 240],
+        depth_image,
+        _pinhole_intrinsics(),
+        factor_depth=10000.0,
+    )
+
+    np.testing.assert_allclose(p_camera, [0.0, 0.0, 2.0])
+
+
+def test_pixel_outside_depth_image_is_rejected():
+    depth_image = np.zeros((480, 640), dtype=np.uint16)
+
+    with pytest.raises(ValueError, match="outside"):
+        pixel_to_camera_point([-1, 240], depth_image, _pinhole_intrinsics())
+
+
+def test_non_positive_factor_depth_is_rejected():
+    depth_image = np.zeros((480, 640), dtype=np.uint16)
+
+    with pytest.raises(ValueError, match="factor_depth"):
+        pixel_to_camera_point(
+            [320, 240],
+            depth_image,
+            _pinhole_intrinsics(),
+            factor_depth=0.0,
+        )
 
 
 def test_invalid_transform_is_rejected():

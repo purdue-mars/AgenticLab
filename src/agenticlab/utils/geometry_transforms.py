@@ -4,7 +4,7 @@ Transform variables follow the mandatory ``T_target_source`` convention:
 ``T_target_source`` maps source-frame coordinates into target-frame
 coordinates, so ``p_target = T_target_source @ p_source``.
 
-This module deliberately has no robot, camera, or VLM dependencies.
+This module deliberately has no robot SDK, camera SDK, or VLM dependencies.
 """
 
 from __future__ import annotations
@@ -162,6 +162,58 @@ def offset_along_local_axis(
     local_offset[axis] = distance
     T_target_source[:3, 3] += T_target_source[:3, :3] @ local_offset
     return T_target_source
+
+
+def pixel_to_camera_point(
+    pixel_xy: ArrayLike,
+    depth_image: ArrayLike,
+    intrinsic_matrix: ArrayLike,
+    factor_depth: float = 1000.0,
+) -> np.ndarray:
+    """Back-project a pixel into a camera-frame point, in meters.
+
+    ``factor_depth`` is the number of raw depth units per meter and mirrors the
+    ``factor_depth`` key of the camera config (1000 for millimeter depth maps).
+    """
+    pixel = np.asarray(pixel_xy, dtype=float)
+    if pixel.shape != (2,):
+        raise ValueError(f"Pixel must have shape (2,), got {pixel.shape}.")
+
+    depth_map = np.asarray(depth_image)
+    if depth_map.ndim != 2:
+        raise ValueError(
+            f"Depth image must be 2-dimensional, got shape {depth_map.shape}."
+        )
+
+    intrinsics = np.asarray(intrinsic_matrix, dtype=float)
+    if intrinsics.shape != (3, 3):
+        raise ValueError(
+            f"Intrinsic matrix must have shape (3, 3), got {intrinsics.shape}."
+        )
+
+    if not np.isfinite(factor_depth) or factor_depth <= 0.0:
+        raise ValueError("factor_depth must be a positive, finite value.")
+
+    x, y = int(pixel[0]), int(pixel[1])
+    height, width = depth_map.shape
+    if not (0 <= x < width and 0 <= y < height):
+        raise ValueError(
+            f"Pixel ({x}, {y}) lies outside the {width}x{height} depth image."
+        )
+
+    depth_meters = float(depth_map[y, x]) / factor_depth
+    fx, fy = intrinsics[0, 0], intrinsics[1, 1]
+    cx, cy = intrinsics[0, 2], intrinsics[1, 2]
+    if fx == 0.0 or fy == 0.0:
+        raise ValueError("Intrinsic focal lengths must be non-zero.")
+
+    return np.array(
+        [
+            (x - cx) * depth_meters / fx,
+            (y - cy) * depth_meters / fy,
+            depth_meters,
+        ]
+    )
 
 
 def apply_local_rpy(

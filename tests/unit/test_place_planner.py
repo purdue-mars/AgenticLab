@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any, Dict, List, Optional, Union
 
 import numpy as np
+import pytest
 from PIL import Image
 
 from agenticlab.core.llm import BaseLLMClient
@@ -53,6 +54,7 @@ def _make_planner(llm, tmp_path, **overrides):
 def test_plan_placing_point_no_reflection(tmp_path):
     llm = _MockLLMClient([{}])
     planner = _make_planner(llm, tmp_path, use_reflection=False)
+    planner.camera_cfg = None  # no intrinsics available
 
     image = Image.new("RGB", (64, 64), color=(0, 0, 0))
     depth = np.zeros((64, 64), dtype=np.uint16)
@@ -67,9 +69,38 @@ def test_plan_placing_point_no_reflection(tmp_path):
     )
 
     assert placing_point.point == [32, 32]
-    assert placing_point.pose_3d is None  # no pixel_to_3d_fn injected
+    assert placing_point.pose_3d is None  # no intrinsics, so no projection
     assert placing_point.visualization_path is not None
     assert llm.call_count == 0
+
+
+def test_plan_placing_point_uses_default_projection(tmp_path):
+    llm = _MockLLMClient([{}])
+    planner = _make_planner(llm, tmp_path, use_reflection=False)
+    planner.camera_cfg = {
+        "Kinect": {
+            "intrinsic_matrix": [
+                [100.0, 0.0, 32.0],
+                [0.0, 100.0, 32.0],
+                [0.0, 0.0, 1.0],
+            ],
+            "factor_depth": 1000.0,
+        }
+    }
+
+    depth = np.full((64, 64), 2000, dtype=np.uint16)  # 2.0 m at factor 1000
+
+    placing_point = planner.plan_placing_point(
+        image=Image.new("RGB", (64, 64)),
+        depth=depth,
+        initial_point=np.array([42, 32]),
+        target_place="plate",
+        task_description="place the cube on the plate",
+    )
+
+    # (42 - 32) * 2.0 / 100 = 0.2 along x; the pixel sits on the principal
+    # row, so y stays 0.
+    assert placing_point.pose_3d == pytest.approx([0.2, 0.0, 2.0])
 
 
 def test_plan_placing_point_reflection_adjust_then_success(tmp_path):
