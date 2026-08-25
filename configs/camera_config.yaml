@@ -1,0 +1,43 @@
+# Example calibration from the reference UR5e workstation.
+# Re-calibrate intrinsics and hand-eye values for your own setup.
+#
+# factor_depth: raw depth units per meter (1000 = millimeter depth maps).
+# handeye_calibration follows the T_target_source convention:
+#   Kinect     -> T_world_camera  (static camera in the robot base frame)
+#   RealSense  -> T_tcp_camera    (wrist camera in the TCP frame)
+
+Kinect:
+  intrinsic_matrix:
+    - [606.3894043, 0.0, 640.44580078]
+    - [0.0, 606.2288208, 363.59103394]
+    - [0.0, 0.0, 1.0]
+  factor_depth: 1000.0
+  width: 1280
+  height: 720
+  handeye_calibration:
+    rotation:
+      - [-0.01272841915529832, -0.6873537667718024, 0.7262112548359614]
+      - [-0.999858011141556, 0.0007283486215854396, -0.016835292226067777]
+      - [0.011042866559852094, -0.7263224275849536, -0.6872654409216581]
+    translation:
+      - 0.04689507078142502
+      - 0.25322672555509933
+      - 0.6609479413385416
+
+RealSense:
+  intrinsic_matrix:
+    - [641.2626953125, 0.0, 631.989501953125]
+    - [0.0, 640.4525146484375, 351.1443176269531]
+    - [0.0, 0.0, 1.0]
+  factor_depth: 10000.0
+  width: 1280
+  height: 720
+  handeye_calibration:
+    rotation:
+      - [0.99998690241857, 0.003673259805214652, -0.003564008097135985]
+      - [-0.0030486805765194535, 0.9868367663005618, 0.1616907610972026]
+      - [0.0041110263992596135, -0.16167777781703235, 0.9868350397214779]
+    translation:
+      - -0.005790935563389012
+      - -0.0655955070334679
+      - -0.14531104853233236
