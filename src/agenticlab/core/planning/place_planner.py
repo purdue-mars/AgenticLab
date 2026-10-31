@@ -1,8 +1,8 @@
 """Place planning: iterative VLM reflection on placing points + orientation.
 
-The pixel-to-3D projection depends on the camera layer (not yet migrated),
-so it is injected as an optional callable. Without it, planning still works
-but ``PlacingPoint.pose_3d`` stays None.
+Pixels are back-projected with ``geometry_transforms.pixel_to_camera_point``
+using the intrinsics in the camera config. A different projection can be
+injected for cameras whose model does not fit the pinhole default.
 """
 
 import json
@@ -19,11 +19,15 @@ from PIL import Image, ImageDraw
 from agenticlab.core.data_types import PlacingPoint
 from agenticlab.core.llm import BaseLLMClient
 from agenticlab.core.paths import output_path, resolve_repo_path
+from agenticlab.utils.geometry_transforms import pixel_to_camera_point
 
 logger = logging.getLogger(__name__)
 
-# Signature: (point_xy, depth, intrinsic_matrix) -> 3D pose in camera frame
+# Signature: (point_xy, depth, intrinsic_matrix) -> 3D point in camera frame
 PixelTo3DFn = Callable[[np.ndarray, np.ndarray, np.ndarray], np.ndarray]
+
+# Raw depth units per meter, used when the camera config omits factor_depth.
+DEFAULT_FACTOR_DEPTH = 1000.0
 
 
 class PlacePlanner:
@@ -42,9 +46,8 @@ class PlacePlanner:
             cfg: Dict config (either full YAML or PlacePlanner section).
             cfg_path: Optional path to YAML config. If cfg is None, defaults to
                 repo_root/configs/place_planner_config.yaml
-            pixel_to_3d_fn: Optional projection function from the camera layer
-                (e.g. cam_capture.pixel_to_camera_3d). If None, pose_3d is
-                left unset on the returned PlacingPoint.
+            pixel_to_3d_fn: Optional override for pixel back-projection.
+                Defaults to geometry_transforms.pixel_to_camera_point.
         """
         self.llm_client = llm_client
         self.pixel_to_3d_fn = pixel_to_3d_fn
@@ -105,10 +108,7 @@ class PlacePlanner:
     def _compute_pose_3d(
         self, point: np.ndarray, depth: np.ndarray, which_camera: str
     ) -> Optional[np.ndarray]:
-        """Project a pixel to a 3D camera-frame pose, if the projection fn is set."""
-        if self.pixel_to_3d_fn is None:
-            logger.warning("No pixel_to_3d_fn injected; skipping 3D pose computation.")
-            return None
+        """Back-project a pixel into the camera frame using camera intrinsics."""
         cam_cfg = (self.camera_cfg or {}).get(which_camera)
         intrinsics_raw = (
             cam_cfg.get("intrinsic_matrix") if isinstance(cam_cfg, dict) else None
@@ -119,8 +119,17 @@ class PlacePlanner:
                 which_camera,
             )
             return None
+
         intrinsics = np.array(intrinsics_raw)
-        return self.pixel_to_3d_fn(point, np.array(depth), intrinsics)
+        depth_map = np.array(depth)
+        if self.pixel_to_3d_fn is not None:
+            return self.pixel_to_3d_fn(point, depth_map, intrinsics)
+        return pixel_to_camera_point(
+            point,
+            depth_map,
+            intrinsics,
+            factor_depth=cam_cfg.get("factor_depth", DEFAULT_FACTOR_DEPTH),
+        )
 
     def plan_placing_point(
         self,
